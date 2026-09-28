@@ -24,7 +24,7 @@ public class mainResultados{
     }
 
     public static boolean isSorted(int[] arreglo){ //metodo para ver si el arreglo esta ordenado
-        for (int i = 0; i < arreglo.length; i++){//recorrer el arreglo
+        for (int i = 0; i < arreglo.length - 1; i++){//recorrer el arreglo
             if (arreglo[i] > arreglo[i + 1]){ //si la posicion 1 es mayorr a la posicion 2 no esta ordenado
                 return false;
             }
@@ -33,7 +33,7 @@ public class mainResultados{
     }
 
     public static boolean isSorted(ArrayList<Integer> lista){//metodo para ver si el arraylist esta ordenado
-        for (int i = 0; i < lista.get(i); i++){//recorremos el arraylist
+        for (int i = 0; i < lista.size() - 1; i++){//recorremos el arraylist
             if(lista.get(i) > lista.get(i + 1)){//si la pos1 es mayor a la pos 2 no esta ordenado
                 return false;
             }
