@@ -1,24 +1,36 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class mainResultados{
-    BufferedReader entrada = new BufferedReader(new InputStreamReader(System.in));
 
-    static int elem = 0;    
-    public static void main(String[] args) throws IOException{
+    public static void mostrarResultados(int elem,
+            ConcurrentHashMap<String, SortResult> results){
+        ArrayList<SortResult> orderedResults = new ArrayList<SortResult>(results.values());
+        Collections.sort(orderedResults);
 
-        mostrarResultados();
-    }
+        System.out.println("\nRESULTADOS DE ORDENAMIENTO");
+        System.out.println("Elementos: " + elem);
+        System.out.printf("%-5s %-18s %-12s %-15s %-10s%n",
+                "Pos.", "Algoritmo", "Estructura", "Tiempo (ms)", "Ordeno");
 
-    public static void mostrarResultados(){
-        System.out.println("RESULTADOS DE ORDENAMIENTO:");
-        System.out.println("Elementos ordenados:" + elem);
-        System.out.println("-------------");
-        System.out.printf("%-5s %-15s %-15s %-15s %-10s%n",
-                  "Pos.", "Algoritmo", "Estructura", "Tiempo (ms)", "¿Ordenó?");
+        for (int i = 0; i < orderedResults.size(); i++) {
+            SortResult result = orderedResults.get(i);
+            String sortedText = result.isSorted() ? "Si" : "No";
 
+            System.out.printf("%-5d %-18s %-12s %-15.4f %-10s%n",
+                    i + 1,
+                    result.getAlgorithm(),
+                    result.getStructure(),
+                    result.getTime(),
+                    sortedText);
+        }
+
+        if (!orderedResults.isEmpty()) {
+            SortResult fastest = orderedResults.get(0);
+            System.out.println("\nImplementacion con menor tiempo registrado: "
+                    + fastest.getAlgorithm() + " (" + fastest.getStructure() + ")");
+        }
     }
 
     public static boolean isSorted(int[] arreglo){ //metodo para ver si el arreglo esta ordenado

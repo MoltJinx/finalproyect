@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,7 +45,7 @@ public class Main {
             return;
         }
 
-        showResults(amount, results);
+        mainResultados.mostrarResultados(amount, results);
         scanner.close();
     }
 
@@ -87,31 +86,4 @@ public class Main {
         return list;
     }
 
-    static void showResults(int amount, ConcurrentHashMap<String, SortResult> results) {
-        ArrayList<SortResult> orderedResults = new ArrayList<SortResult>(results.values());
-        Collections.sort(orderedResults);
-
-        System.out.println("\nRESULTADOS DE ORDENAMIENTO");
-        System.out.println("Elementos: " + amount);
-        System.out.printf("%-5s %-18s %-12s %-15s %-10s%n",
-                "Pos.", "Algoritmo", "Estructura", "Tiempo (ms)", "Ordeno");
-
-        for (int i = 0; i < orderedResults.size(); i++) {
-            SortResult result = orderedResults.get(i);
-            String sortedText = result.isSorted() ? "Si" : "No";
-
-            System.out.printf("%-5d %-18s %-12s %-15.4f %-10s%n",
-                    i + 1,
-                    result.getAlgorithm(),
-                    result.getStructure(),
-                    result.getTime(),
-                    sortedText);
-        }
-
-        if (!orderedResults.isEmpty()) {
-            SortResult fastest = orderedResults.get(0);
-            System.out.println("\nImplementacion con menor tiempo registrado: "
-                    + fastest.getAlgorithm() + " (" + fastest.getStructure() + ")");
-        }
-    }
 }
