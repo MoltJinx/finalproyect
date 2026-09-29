@@ -33,6 +33,39 @@ public class mainResultados{
         }
     }
 
+    public static void mostrarResultadosTiempo(int elem, int seconds,
+            ConcurrentHashMap<String, TimeLimitResult> results){
+        ArrayList<TimeLimitResult> orderedResults =
+                new ArrayList<TimeLimitResult>(results.values());
+        Collections.sort(orderedResults);
+
+        System.out.println("\nRESULTADOS POR TIEMPO LIMITE");
+        System.out.println("Elementos por coleccion: " + elem);
+        System.out.println("Tiempo limite: " + seconds + " segundos");
+        System.out.printf("%-5s %-18s %-12s %-14s %-18s %-10s%n",
+                "Pos.", "Algoritmo", "Estructura", "Completadas",
+                "Promedio (ms)", "Ordeno");
+
+        for (int i = 0; i < orderedResults.size(); i++) {
+            TimeLimitResult result = orderedResults.get(i);
+            String sortedText = result.isSorted() ? "Si" : "No";
+
+            System.out.printf("%-5d %-18s %-12s %-14d %-18.4f %-10s%n",
+                    i + 1,
+                    result.getAlgorithm(),
+                    result.getStructure(),
+                    result.getCompleted(),
+                    result.getAverageTime(),
+                    sortedText);
+        }
+
+        if (!orderedResults.isEmpty()) {
+            TimeLimitResult first = orderedResults.get(0);
+            System.out.println("\nImplementacion con mas colecciones completadas: "
+                    + first.getAlgorithm() + " (" + first.getStructure() + ")");
+        }
+    }
+
     public static boolean isSorted(int[] arreglo){ //metodo para ver si el arreglo esta ordenado
         for (int i = 0; i < arreglo.length - 1; i++){//recorrer el arreglo
             if (arreglo[i] > arreglo[i + 1]){ //si la posicion 1 es mayorr a la posicion 2 no esta ordenado

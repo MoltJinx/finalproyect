@@ -1,3 +1,5 @@
+import java.util.concurrent.ConcurrentHashMap;
+
 public class shellSortArr {
     public static void ShellSort(int[] arr) {
         int n = arr.length;
@@ -24,5 +26,28 @@ public class shellSortArr {
             System.out.print(num + " ");
         }
         System.out.println();
+    }
+
+    public static class SortThread extends Thread {
+        private int[] arr;
+        private ConcurrentHashMap<String, SortResult> results;
+
+        public SortThread(int[] arr, ConcurrentHashMap<String, SortResult> results) {
+            this.arr = arr;
+            this.results = results;
+        }
+
+        @Override
+        public void run() {
+            long start = System.nanoTime();
+            ShellSort(arr);
+            long end = System.nanoTime();
+
+            double milliseconds = (end - start) / 1000000.0;
+            SortResult result = new SortResult(
+                    "Shell Sort", "Arreglo", milliseconds, mainResultados.isSorted(arr)
+            );
+            results.put("Shell Sort - Arreglo", result);
+        }
     }
 }

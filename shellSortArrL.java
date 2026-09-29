@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class shellSortArrL {
 
@@ -27,5 +28,29 @@ public class shellSortArrL {
             System.out.print(num + " ");
         }
         System.out.println();
+    }
+
+    public static class SortThread extends Thread {
+        private ArrayList<Integer> arr;
+        private ConcurrentHashMap<String, SortResult> results;
+
+        public SortThread(ArrayList<Integer> arr,
+                ConcurrentHashMap<String, SortResult> results) {
+            this.arr = arr;
+            this.results = results;
+        }
+
+        @Override
+        public void run() {
+            long start = System.nanoTime();
+            ShellSort(arr);
+            long end = System.nanoTime();
+
+            double milliseconds = (end - start) / 1000000.0;
+            SortResult result = new SortResult(
+                    "Shell Sort", "ArrayList", milliseconds, mainResultados.isSorted(arr)
+            );
+            results.put("Shell Sort - ArrayList", result);
+        }
     }
 }
