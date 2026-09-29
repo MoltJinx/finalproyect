@@ -74,10 +74,10 @@ public class mainResultados{
 
         System.out.println("\nCOMPROBACION DE META POR TIEMPO");
         System.out.println("Elementos por coleccion: " + elem);
-        System.out.println("Meta por implementacion: " + target + " colecciones");
+        System.out.println("Colecciones solicitadas: " + target);
         System.out.println("Tiempo limite: " + seconds + " segundos");
         System.out.printf("%-5s %-18s %-12s %-12s %-12s %-16s %-10s%n",
-                "Pos.", "Algoritmo", "Estructura", "Meta", "Completo",
+                "Pos.", "Algoritmo", "Estructura", "Solicitadas", "Completo",
                 "Promedio (ms)", "Cumplio");
 
         for (int i = 0; i < orderedResults.size(); i++) {

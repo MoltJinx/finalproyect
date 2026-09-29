@@ -134,7 +134,7 @@ public class Main {
         System.out.print("Cuantos elementos tendra cada coleccion? ");
         int amount = readPositiveInt(scanner);
 
-        System.out.print("Cuantas colecciones debe completar cada implementacion? ");
+        System.out.print("Cuantas colecciones quieres ordenar? ");
         int target = readPositiveInt(scanner);
 
         System.out.print("Cuantos segundos tendra para completarlas? ");
