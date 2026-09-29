@@ -10,14 +10,17 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("1. Comparar ordenamientos por cantidad de elementos");
-        System.out.println("2. Probar ordenamientos por tiempo limite");
+        System.out.println("2. Ver cuantas colecciones ordena en un tiempo limite");
+        System.out.println("3. Comprobar una meta de colecciones en un tiempo limite");
         System.out.print("Opcion: ");
         int option = readOption(scanner);
 
         if (option == 1) {
             normalMode(scanner);
-        } else {
+        } else if (option == 2) {
             timeLimitMode(scanner);
+        } else {
+            targetMode(scanner);
         }
 
         scanner.close();
@@ -87,7 +90,7 @@ public class Main {
     }
 
     static void timeLimitMode(Scanner scanner) {
-        System.out.print("Cuantos elementos tendra cada coleccion? ");
+        System.out.print("Cuantos elementos tendra cada intento de ordenamiento? ");
         int amount = readPositiveInt(scanner);
 
         System.out.print("Cuantos segundos durara la prueba? ");
@@ -127,18 +130,62 @@ public class Main {
         mainResultados.mostrarResultadosTiempo(amount, seconds, results);
     }
 
+    static void targetMode(Scanner scanner) {
+        System.out.print("Cuantos elementos tendra cada coleccion? ");
+        int amount = readPositiveInt(scanner);
+
+        System.out.print("Cuantas colecciones debe completar cada implementacion? ");
+        int target = readPositiveInt(scanner);
+
+        System.out.print("Cuantos segundos tendra para completarlas? ");
+        int seconds = readPositiveInt(scanner);
+
+        int[] originalNumbers = generateNumbers(amount);
+        ConcurrentHashMap<String, TimeLimitResult> results =
+                new ConcurrentHashMap<String, TimeLimitResult>();
+
+        Thread[] threads = {
+                new TimeLimitThread("Bubble Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Bubble Sort", "ArrayList", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Selection Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Selection Sort", "ArrayList", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Insertion Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Insertion Sort", "ArrayList", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Quick Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Quick Sort", "ArrayList", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Shell Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Shell Sort", "ArrayList", originalNumbers, seconds, target, results)
+        };
+
+        for (int i = 0; i < threads.length; i++) {
+            threads[i].start();
+        }
+
+        try {
+            for (int i = 0; i < threads.length; i++) {
+                threads[i].join();
+            }
+        } catch (InterruptedException e) {
+            System.out.println("Se interrumpio la ejecucion de los hilos.");
+            Thread.currentThread().interrupt();
+            return;
+        }
+
+        mainResultados.mostrarResultadosMeta(amount, target, seconds, results);
+    }
+
     static int readOption(Scanner scanner) {
         while (true) {
             try {
                 int option = Integer.parseInt(scanner.nextLine().trim());
 
-                if (option == 1 || option == 2) {
+                if (option >= 1 && option <= 3) {
                     return option;
                 }
 
-                System.out.print("Elige la opcion 1 o 2: ");
+                System.out.print("Elige la opcion 1, 2 o 3: ");
             } catch (NumberFormatException e) {
-                System.out.print("Elige la opcion 1 o 2: ");
+                System.out.print("Elige la opcion 1, 2 o 3: ");
             }
         }
     }

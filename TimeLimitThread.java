@@ -8,6 +8,7 @@ public class TimeLimitThread extends Thread {
     private String structure;
     private int[] originalNumbers;
     private int seconds;
+    private int target;
     private ConcurrentHashMap<String, TimeLimitResult> results;
 
     public TimeLimitThread(String algorithm, String structure, int[] originalNumbers,
@@ -16,6 +17,18 @@ public class TimeLimitThread extends Thread {
         this.structure = structure;
         this.originalNumbers = originalNumbers;
         this.seconds = seconds;
+        this.target = 0;
+        this.results = results;
+    }
+
+    public TimeLimitThread(String algorithm, String structure, int[] originalNumbers,
+            int seconds, int target,
+            ConcurrentHashMap<String, TimeLimitResult> results) {
+        this.algorithm = algorithm;
+        this.structure = structure;
+        this.originalNumbers = originalNumbers;
+        this.seconds = seconds;
+        this.target = target;
         this.results = results;
     }
 
@@ -26,7 +39,8 @@ public class TimeLimitThread extends Thread {
         int completed = 0;
         boolean sorted = true;
 
-        while (System.nanoTime() < endTime && sorted) {
+        while (System.nanoTime() < endTime && sorted
+                && (target == 0 || completed < target)) {
             long start;
             long end;
 
@@ -44,9 +58,11 @@ public class TimeLimitThread extends Thread {
                 sorted = mainResultados.isSorted(numbers);
             }
 
-            if (sorted) {
+            if (sorted && end <= endTime) {
                 totalSortTime += end - start;
                 completed++;
+            } else if (end > endTime) {
+                break;
             }
         }
 

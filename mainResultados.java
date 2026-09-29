@@ -66,6 +66,36 @@ public class mainResultados{
         }
     }
 
+    public static void mostrarResultadosMeta(int elem, int target, int seconds,
+            ConcurrentHashMap<String, TimeLimitResult> results){
+        ArrayList<TimeLimitResult> orderedResults =
+                new ArrayList<TimeLimitResult>(results.values());
+        Collections.sort(orderedResults);
+
+        System.out.println("\nCOMPROBACION DE META POR TIEMPO");
+        System.out.println("Elementos por coleccion: " + elem);
+        System.out.println("Meta por implementacion: " + target + " colecciones");
+        System.out.println("Tiempo limite: " + seconds + " segundos");
+        System.out.printf("%-5s %-18s %-12s %-12s %-12s %-16s %-10s%n",
+                "Pos.", "Algoritmo", "Estructura", "Meta", "Completo",
+                "Promedio (ms)", "Cumplio");
+
+        for (int i = 0; i < orderedResults.size(); i++) {
+            TimeLimitResult result = orderedResults.get(i);
+            boolean completedTarget = result.getCompleted() >= target && result.isSorted();
+            String completedText = completedTarget ? "Si" : "No";
+
+            System.out.printf("%-5d %-18s %-12s %-12d %-12d %-16.4f %-10s%n",
+                    i + 1,
+                    result.getAlgorithm(),
+                    result.getStructure(),
+                    target,
+                    result.getCompleted(),
+                    result.getAverageTime(),
+                    completedText);
+        }
+    }
+
     public static boolean isSorted(int[] arreglo){ //metodo para ver si el arreglo esta ordenado
         for (int i = 0; i < arreglo.length - 1; i++){//recorrer el arreglo
             if (arreglo[i] > arreglo[i + 1]){ //si la posicion 1 es mayorr a la posicion 2 no esta ordenado
