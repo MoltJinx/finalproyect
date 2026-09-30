@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,6 +95,41 @@ public class mainResultados{
                     result.getAverageTime(),
                     completedText);
         }
+    }
+
+    public static void guardarResultados(PrintWriter writer, int elem, String dataType,
+            ConcurrentHashMap<String, SortResult> results){
+        ArrayList<SortResult> orderedResults = new ArrayList<SortResult>(results.values());
+        Collections.sort(orderedResults);
+
+        writer.println("RESULTADOS DE ORDENAMIENTO");
+        writer.println("Elementos: " + elem);
+        writer.println("Tipo de datos: " + dataType);
+        writer.printf("%-5s %-18s %-12s %-15s %-10s%n",
+                "Pos.", "Algoritmo", "Estructura", "Tiempo (ms)", "Ordeno");
+
+        for (int i = 0; i < orderedResults.size(); i++) {
+            SortResult result = orderedResults.get(i);
+            String sortedText = result.isSorted() ? "Si" : "No";
+
+            writer.printf("%-5d %-18s %-12s %-15.4f %-10s%n",
+                    i + 1,
+                    result.getAlgorithm(),
+                    result.getStructure(),
+                    result.getTime(),
+                    sortedText);
+        }
+
+        if (!orderedResults.isEmpty()) {
+            SortResult fastest = orderedResults.get(0);
+            SortResult slowest = orderedResults.get(orderedResults.size() - 1);
+            writer.println("Implementacion mas rapida: "
+                    + fastest.getAlgorithm() + " (" + fastest.getStructure() + ")");
+            writer.println("Implementacion mas lenta: "
+                    + slowest.getAlgorithm() + " (" + slowest.getStructure() + ")");
+        }
+
+        writer.println();
     }
 
     public static boolean isSorted(int[] arreglo){ //metodo para ver si el arreglo esta ordenado

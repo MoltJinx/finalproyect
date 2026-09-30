@@ -1,3 +1,5 @@
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -12,6 +14,7 @@ public class Main {
         System.out.println("1. Comparar ordenamientos por cantidad de elementos");
         System.out.println("2. Ver cuantas colecciones ordena en un tiempo limite");
         System.out.println("3. Comprobar una meta de colecciones en un tiempo limite");
+        System.out.println("4. Ejecutar y guardar las pruebas recomendadas");
         System.out.print("Opcion: ");
         int option = readOption(scanner);
 
@@ -19,8 +22,10 @@ public class Main {
             normalMode(scanner);
         } else if (option == 2) {
             timeLimitMode(scanner);
-        } else {
+        } else if (option == 3) {
             targetMode(scanner);
+        } else {
+            recommendedTestsMode(scanner);
         }
 
         scanner.close();
@@ -30,7 +35,25 @@ public class Main {
         System.out.print("Cuantos elementos vas a ordenar? ");
         int amount = readPositiveInt(scanner);
 
-        int[] originalNumbers = generateNumbers(amount);
+        System.out.println("1. Numeros aleatorios entre 1 y 100000");
+        System.out.println("2. Numeros restringidos entre 1 y 5");
+        System.out.print("Tipo de datos: ");
+        int generationOption = readGenerationOption(scanner);
+
+        boolean restricted = generationOption == 2;
+        int[] originalNumbers = generateNumbers(amount, restricted);
+
+        try {
+            ConcurrentHashMap<String, SortResult> results = executeComparison(originalNumbers);
+            mainResultados.mostrarResultados(amount, results);
+        } catch (InterruptedException e) {
+            System.out.println("Se interrumpio la ejecucion de los hilos.");
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    static ConcurrentHashMap<String, SortResult> executeComparison(int[] originalNumbers)
+            throws InterruptedException {
         ArrayList<Integer> originalList = convertToArrayList(originalNumbers);
 
         int[] bubbleArray = Arrays.copyOf(originalNumbers, originalNumbers.length);
@@ -38,11 +61,13 @@ public class Main {
         int[] insertionArray = Arrays.copyOf(originalNumbers, originalNumbers.length);
         int[] quickArray = Arrays.copyOf(originalNumbers, originalNumbers.length);
         int[] shellArray = Arrays.copyOf(originalNumbers, originalNumbers.length);
+        int[] mergeArray = Arrays.copyOf(originalNumbers, originalNumbers.length);
         ArrayList<Integer> bubbleList = new ArrayList<Integer>(originalList);
         ArrayList<Integer> selectionList = new ArrayList<Integer>(originalList);
         ArrayList<Integer> insertionList = new ArrayList<Integer>(originalList);
         ArrayList<Integer> quickList = new ArrayList<Integer>(originalList);
         ArrayList<Integer> shellList = new ArrayList<Integer>(originalList);
+        ArrayList<Integer> mergeList = new ArrayList<Integer>(originalList);
 
         ConcurrentHashMap<String, SortResult> results =
                 new ConcurrentHashMap<String, SortResult>();
@@ -57,6 +82,8 @@ public class Main {
         Thread quickListThread = new quickSortArrL.SortThread(quickList, results);
         Thread shellArrayThread = new shellSortArr.SortThread(shellArray, results);
         Thread shellListThread = new shellSortArrL.SortThread(shellList, results);
+        Thread mergeArrayThread = new MergeSortArray.SortThread(mergeArray, results);
+        Thread mergeListThread = new MergeSortArrayL.SortThread(mergeList, results);
 
         bubbleArrayThread.start();
         bubbleListThread.start();
@@ -68,25 +95,23 @@ public class Main {
         quickListThread.start();
         shellArrayThread.start();
         shellListThread.start();
+        mergeArrayThread.start();
+        mergeListThread.start();
 
-        try {
-            bubbleArrayThread.join();
-            bubbleListThread.join();
-            selectionArrayThread.join();
-            selectionListThread.join();
-            insertionArrayThread.join();
-            insertionListThread.join();
-            quickArrayThread.join();
-            quickListThread.join();
-            shellArrayThread.join();
-            shellListThread.join();
-        } catch (InterruptedException e) {
-            System.out.println("Se interrumpio la ejecucion de los hilos.");
-            Thread.currentThread().interrupt();
-            return;
-        }
+        bubbleArrayThread.join();
+        bubbleListThread.join();
+        selectionArrayThread.join();
+        selectionListThread.join();
+        insertionArrayThread.join();
+        insertionListThread.join();
+        quickArrayThread.join();
+        quickListThread.join();
+        shellArrayThread.join();
+        shellListThread.join();
+        mergeArrayThread.join();
+        mergeListThread.join();
 
-        mainResultados.mostrarResultados(amount, results);
+        return results;
     }
 
     static void timeLimitMode(Scanner scanner) {
@@ -110,7 +135,9 @@ public class Main {
                 new TimeLimitThread("Quick Sort", "Arreglo", originalNumbers, seconds, results),
                 new TimeLimitThread("Quick Sort", "ArrayList", originalNumbers, seconds, results),
                 new TimeLimitThread("Shell Sort", "Arreglo", originalNumbers, seconds, results),
-                new TimeLimitThread("Shell Sort", "ArrayList", originalNumbers, seconds, results)
+                new TimeLimitThread("Shell Sort", "ArrayList", originalNumbers, seconds, results),
+                new TimeLimitThread("Merge Sort", "Arreglo", originalNumbers, seconds, results),
+                new TimeLimitThread("Merge Sort", "ArrayList", originalNumbers, seconds, results)
         };
 
         for (int i = 0; i < threads.length; i++) {
@@ -154,7 +181,9 @@ public class Main {
                 new TimeLimitThread("Quick Sort", "Arreglo", originalNumbers, seconds, target, results),
                 new TimeLimitThread("Quick Sort", "ArrayList", originalNumbers, seconds, target, results),
                 new TimeLimitThread("Shell Sort", "Arreglo", originalNumbers, seconds, target, results),
-                new TimeLimitThread("Shell Sort", "ArrayList", originalNumbers, seconds, target, results)
+                new TimeLimitThread("Shell Sort", "ArrayList", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Merge Sort", "Arreglo", originalNumbers, seconds, target, results),
+                new TimeLimitThread("Merge Sort", "ArrayList", originalNumbers, seconds, target, results)
         };
 
         for (int i = 0; i < threads.length; i++) {
@@ -174,18 +203,85 @@ public class Main {
         mainResultados.mostrarResultadosMeta(amount, target, seconds, results);
     }
 
+    static void recommendedTestsMode(Scanner scanner) {
+        System.out.println("\nEsta prueba puede tardar bastante tiempo.");
+        System.out.print("Deseas continuar? (s/n): ");
+        String answer = scanner.nextLine().trim();
+
+        if (!answer.equalsIgnoreCase("s")) {
+            System.out.println("Prueba cancelada.");
+            return;
+        }
+
+        int[] sizes = {100, 50000, 100000, 100000};
+        boolean[] restricted = {false, false, false, true};
+
+        try {
+            PrintWriter writer = new PrintWriter("resultados_pruebas.txt");
+
+            for (int i = 0; i < sizes.length; i++) {
+                String dataType;
+                if (restricted[i]) {
+                    dataType = "Numeros restringidos entre 1 y 5";
+                } else {
+                    dataType = "Numeros aleatorios entre 1 y 100000";
+                }
+
+                System.out.println("\nEjecutando prueba de " + sizes[i] + " elementos...");
+                int[] originalNumbers = generateNumbers(sizes[i], restricted[i]);
+
+                try {
+                    ConcurrentHashMap<String, SortResult> results =
+                            executeComparison(originalNumbers);
+                    mainResultados.mostrarResultados(sizes[i], results);
+                    mainResultados.guardarResultados(
+                            writer, sizes[i], dataType, results
+                    );
+                    writer.flush();
+                } catch (InterruptedException e) {
+                    writer.println("La prueba fue interrumpida.");
+                    writer.close();
+                    System.out.println("Se interrumpio la ejecucion de los hilos.");
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+            }
+
+            writer.close();
+            System.out.println("\nResultados guardados en resultados_pruebas.txt");
+        } catch (FileNotFoundException e) {
+            System.out.println("No se pudo crear el archivo de resultados.");
+        }
+    }
+
     static int readOption(Scanner scanner) {
         while (true) {
             try {
                 int option = Integer.parseInt(scanner.nextLine().trim());
 
-                if (option >= 1 && option <= 3) {
+                if (option >= 1 && option <= 4) {
                     return option;
                 }
 
-                System.out.print("Elige la opcion 1, 2 o 3: ");
+                System.out.print("Elige la opcion 1, 2, 3 o 4: ");
             } catch (NumberFormatException e) {
-                System.out.print("Elige la opcion 1, 2 o 3: ");
+                System.out.print("Elige la opcion 1, 2, 3 o 4: ");
+            }
+        }
+    }
+
+    static int readGenerationOption(Scanner scanner) {
+        while (true) {
+            try {
+                int option = Integer.parseInt(scanner.nextLine().trim());
+
+                if (option == 1 || option == 2) {
+                    return option;
+                }
+
+                System.out.print("Elige la opcion 1 o 2: ");
+            } catch (NumberFormatException e) {
+                System.out.print("Elige la opcion 1 o 2: ");
             }
         }
     }
@@ -207,11 +303,16 @@ public class Main {
     }
 
     static int[] generateNumbers(int amount) {
+        return generateNumbers(amount, false);
+    }
+
+    static int[] generateNumbers(int amount, boolean restricted) {
         Random random = new Random();
         int[] numbers = new int[amount];
+        int maximum = restricted ? 5 : 100000;
 
         for (int i = 0; i < numbers.length; i++) {
-            numbers[i] = random.nextInt(100000) + 1;
+            numbers[i] = random.nextInt(maximum) + 1;
         }
 
         return numbers;

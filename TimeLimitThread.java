@@ -88,6 +88,8 @@ public class TimeLimitThread extends Thread {
             quickSortArr.QuickSort(numbers, 0, numbers.length - 1);
         } else if (algorithm.equals("Shell Sort")) {
             shellSortArr.ShellSort(numbers);
+        } else if (algorithm.equals("Merge Sort")) {
+            MergeSortArray.ordenar(numbers);
         }
     }
 
@@ -102,6 +104,8 @@ public class TimeLimitThread extends Thread {
             quickSortArrL.QuickSort(numbers, 0, numbers.size() - 1);
         } else if (algorithm.equals("Shell Sort")) {
             shellSortArrL.ShellSort(numbers);
+        } else if (algorithm.equals("Merge Sort")) {
+            MergeSortArrayL.ordenar(numbers);
         }
     }
 

@@ -2,33 +2,39 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class quickSortArrL {
-    public static int particion(ArrayList<Integer> array, int inicio, int fin){
-        int pivote = array.get(fin);
-        int i = inicio - 1;
-        for (int j = inicio; j < fin; j++) {
-
-        if (array.get(j) <= pivote) {
-            i++;
-
-            int temp = array.get(i);
-            array.set(i, array.get(j));
-            array.set(j, temp);
-        }
-    }
-
-    int temp = array.get(i + 1);
-    array.set(i + 1, array.get(fin));
-    array.set(fin, temp);
-
-    return i + 1;
-    }
-
-
     public static void QuickSort(ArrayList<Integer> array, int inicio, int fin){
-        if (inicio < fin){
-            int pivot = particion(array, inicio, fin);
-            QuickSort(array, inicio, pivot - 1); //ordenar izquierda de pivote
-            QuickSort(array, pivot + 1, fin);// ordenar derecha de pivote
+        if (inicio >= fin) {
+            return;
+        }
+
+        int i = inicio;
+        int j = fin;
+        int pivote = array.get(inicio + (fin - inicio) / 2);
+
+        while (i <= j) {
+            while (array.get(i) < pivote) {
+                i++;
+            }
+
+            while (array.get(j) > pivote) {
+                j--;
+            }
+
+            if (i <= j) {
+                int temp = array.get(i);
+                array.set(i, array.get(j));
+                array.set(j, temp);
+                i++;
+                j--;
+            }
+        }
+
+        if (inicio < j) {
+            QuickSort(array, inicio, j);
+        }
+
+        if (i < fin) {
+            QuickSort(array, i, fin);
         }
     }
 
